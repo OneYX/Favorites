@@ -1,11 +1,5 @@
 # 透明代理 UDP 为什么要用 TProxy？
 
-[![img](透明代理 UDP 为什么要用 TProxy.assets/bfa722e8-4982-4a9b-aa72-02d74aeca482.png)](https://www.jianshu.com/u/6f06de5a77bd)
-
-[闲云野马](https://www.jianshu.com/u/6f06de5a77bd)关注
-
-0.2282019.11.17 00:50:19字数 1,166阅读 1,910
-
 假设你在路由器上搭建透明代理，要将局域网发过来的 UDP 流量（不包括路由器本身发出的流量）转发到透明代理，你需要执行以下这些命令：
 
 
@@ -135,7 +129,7 @@ iptables -t mangle -I PREROUTING -p udp --dport 53 -j TPROXY --on-port 1090 --tp
 
 这一句直接就将包原封不动地投递到本地 1090 的 udp socket 了，那么为何还要搞个 --tproxy-mark 0x01/0x01 的选项呢？
 
-![img](透明代理 UDP 为什么要用 TProxy.assets/1113084-89617ccf2861daa5.png)
+![img](透明代理UDP为什么要用TProxy.assets/1113084-89617ccf2861daa5.png)
 
 iptables flow
 
@@ -184,11 +178,3 @@ iptables -t mangle -I OUTPUT -p udp --dport 53 -j MARK --set-mark 1
 [https://github.com/ahupowerdns/tproxydoc/blob/master/tproxy.md](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fahupowerdns%2Ftproxydoc%2Fblob%2Fmaster%2Ftproxy.md)
 [https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture](https://links.jianshu.com/go?to=https%3A%2F%2Fwww.digitalocean.com%2Fcommunity%2Ftutorials%2Fa-deep-dive-into-iptables-and-netfilter-architecture)
 [http://lists.netfilter.org/pipermail/netfilter-devel/2001-February/000564.html](https://links.jianshu.com/go?to=http%3A%2F%2Flists.netfilter.org%2Fpipermail%2Fnetfilter-devel%2F2001-February%2F000564.html)
-
-
-
-4人点赞
-
-
-
-[日记本](https://www.jianshu.com/nb/2264832)
