@@ -1,0 +1,87 @@
+1. ### OOM案例：
+    - 重写finalize方法 (xiaomi)
+    - ThreadLocal 与 线程池
+    
+java四种引用类型：强、软、弱、虚
+
+软引用（SoftReference）特点：
+  内存不够软引用将被清理
+  软引用非常适合缓存使用
+  占地了就get不到
+
+弱引用（WeakReference）特点：
+  垃圾回收器看到就清理
+  垃圾回收之前可以get到
+  static class ThreadLocalMap {
+
+        /**
+         * The entries in this hash map extend WeakReference, using
+         * its main ref field as the key (which is always a
+         * ThreadLocal object).  Note that null keys (i.e. entry.get()
+         * == null) mean that the key is no longer referenced, so the
+         * entry can be expunged from table.  Such entries are referred to
+         * as "stale entries" in the code that follows.
+         */
+        static class Entry extends WeakReference<ThreadLocal<?>> 
+
+虚引用（PhantomReference）特点：
+  
+  一直get不到
+  作用是管理直接内存，即堆外内存
+  ByteBuffer buffer = ByteBuffer.allocate(1024) 分配JVM管理的堆内存
+  ByteBuffer buffer = ByteBuffer.allocateDirect(1024) 分配操作系统管理的堆外内存
+
+  class Cleaner extends PhantomReference<Object>
+  
+  
+
+-Xms初始的Heap的大小
+-Xmx最大Heap的大小
+
+问题: ThreadLocal什么地方会存在内存泄漏，为什么使用弱引用就能保证它不内存泄漏？ 用完需要remove
+	轻量级锁的效率是不是一定比重量级的锁效率高？ 不是, 不同的场景用不同的锁
+
+	轻量级锁： 自旋锁 while循环等待 cas是自旋锁的实现方式
+	重量级锁： 需操作系统调度
+
+synchronized 
+
+AtomicInteger addAndGet()
+native boolean compareAndSwapInt
+CAS原子性由汇编指令保证： lock cmpxchg; lock指令表示锁总线，其后指令单核执行。
+
+JUC包里面全由CAS实现
+
+CAS存在的ABA问题通过版本号解决
+
+偏向锁：
+
+缓存行： 大多64字节（工业实践）
+Intel MESI 缓存一致性协议
+
+volatile System.out.println
+作用： 线程可见性, 使其修饰的内存，一个线程对其修改，另一个线程立即可见
+       禁止指令重排
+
+美团：DCL 单例 要不要加volatile?
+
+CPU 指令乱序； new 三步 半初始化
+
+===================================================
+
+垃圾回收
+
+如何找到垃圾 1.引用计数, 无法解决循环应用的问题; 2. JVM 使用 Root Searching, 重Root开始找，找不到的确定为垃圾
+
+垃圾回收算法 1.Mark-Sweep 标记清除 碎片化 2.Copying 一分为二，使用其一 浪费空间 3.Mark-Compact 边标记边整理 效率底
+
+对象内存 栈 标量替换，逃逸分析
+TLAB: Therad Local Allocation Buffer； Eden区 线程私有区域 用完再去抢占公共空间
+
+CMS: 
+ 初始标记 几百毫秒 STW 查找Root G1: 10ms ZGC: 1ms
+ 并发标记 查找Root下面的对象 浮动垃圾：标记过程中产生的垃圾，下次标记； 错标： 查找的同时建立引用，是垃圾的对象变成不是垃圾
+ 重新标记 修正错标的内容 STW 三色标记
+ 并发清理 过程依然产生浮动垃圾，下次清理
+
+===================================================
