@@ -1,4 +1,4 @@
-[![img](Java基础之Synchronized原理.assets/686418-20200630151944391-1320178406.png)](https://img2020.cnblogs.com/blog/686418/202006/686418-20200630151944391-1320178406.png)
+[![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160721.png)](https://img2020.cnblogs.com/blog/686418/202006/686418-20200630151944391-1320178406.png)
 
 思维导图svg: https://note.youdao.com/ynoteshare1/index.html?id=eb05fdceddd07759b8b82c5b9094021a&type=note
 
@@ -159,7 +159,7 @@ Java虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)�
 
 在JVM中，对象在内存中到布局分为三块区域：对象头，实例数据和对齐填充。 如下：
 
-[![img](Java基础之Synchronized原理.assets/20170603163237166)](https://img-blog.csdn.net/20170603163237166?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamF2YXplamlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160742)](https://img-blog.csdn.net/20170603163237166?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamF2YXplamlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 - 实例变量： 存放类的属性数据信息，包括父类的属性信息，如果是数组的实例部分还包括数组的长度，这部分内存按4字节对齐。
 - 填充数据：由于虚拟机要求对象起始地址必须是8字节的整数倍。填充数据不是必须存在的，仅仅是为了字节对齐。
@@ -179,7 +179,7 @@ Java虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)�
 
 由于对象头的信息是与对象自身定义的数据没有关系到额外存储成本，因此考虑到JVM的空间效率，Mark Word被设计成为一个非固定的数据结构，以便存储更多有效的数据，它会根据对象本身的状态复用自己的存储空间，如32位JVM下，除了上述列出的Mark Word默认存储结构外，还有如下可能变化的结构：
 
-[![img](Java基础之Synchronized原理.assets/20170603172215966)](https://img-blog.csdn.net/20170603172215966?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamF2YXplamlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160804)](https://img-blog.csdn.net/20170603172215966?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamF2YXplamlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 其中，轻量级锁和偏向锁是Java 6对synchronized锁进行优化后新增加的，我们稍后简要分析。这里我们主要分析一下重量级锁也就是通常说的synchronized的对象锁，锁标识位10，其中指针指向的时monitor对象(也称为管程或监视器锁)的起始地址。每个对象都存在着一个monitor与之关联，对象与其monitor之间的关系有存在多种实现方式，如monitor可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个monitor被某个线程持有后，它便处于锁定状态。在Java虚拟机(HotSpot)中，monitor是由ObjetMonitor实现的，其主要数据结构如下(位于HotSpot虚拟机源码ObjectMonitor.hpp文件，C++实现的)
 
@@ -212,7 +212,7 @@ ObjectMonitor中有两个队列， `_WaitSet`和`_EntryList`， 用来保存Obje
 
 若线程调用wait()方法，将释放当前持有的monitor， owner=null， count-1, 同时该线程进入waitSet集合中等待被唤醒。若当前线程执行完毕也将释放monitor(锁)，并复位变量的值，以便其他线程进入获取monitor(锁)。 如下图所示：
 
-[![img](Java基础之Synchronized原理.assets/20170604114223462)](https://img-blog.csdn.net/20170604114223462?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamF2YXplamlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160811)](https://img-blog.csdn.net/20170604114223462?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamF2YXplamlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 由此看来，monitor对象存在于每个Java对象的对象头中(存储的指针的指向)，synchronized锁便是通过这种方式获取锁的，也是为什么Java中任意对象可以作为锁的原因，同时也是notify/notifyAll/wait等方法存在于顶级对象Object中的原因(关于这点稍后还会进行分析)，ok~，有了上述知识基础后，下面我们将进一步分析synchronized在字节码层面的具体语义实现。
 
@@ -417,7 +417,7 @@ public class StringBufferRemoveSync {
 
 ### 无锁->偏向锁
 
-[![img](Java基础之Synchronized原理.assets/640)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8giahbLO6jDZkMbiaOpkCU63biaAyZ89MP91WNe4JzDxyI3HhFXm5vUaNY7g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+[![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160818)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8giahbLO6jDZkMbiaOpkCU63biaAyZ89MP91WNe4JzDxyI3HhFXm5vUaNY7g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 1. 首先A 线程访问同步代码块，使用CAS 操作将 Thread ID 放到 Mark Word 当中；
 2. 如果CAS 成功，此时线程A 就获取了锁
@@ -428,17 +428,17 @@ public class StringBufferRemoveSync {
 
 1. 线程A在自己的栈桢中创建锁记录 LockRecord。
 2. 线程A 将 Mark Word 拷贝到线程栈的 Lock Record中，这个位置叫 displayced hdr，如下图所示：
-   [![img](Java基础之Synchronized原理.assets/640)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8giaLjST0XfiarbR6vlTRgVfrR9z91nLlhh0bGHekbQ3Libl6RrWcHml7rdA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+   [![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160829)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8giaLjST0XfiarbR6vlTRgVfrR9z91nLlhh0bGHekbQ3Libl6RrWcHml7rdA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 3. 将锁记录中的Owner指针指向加锁的对象（存放对象地址）。
 4. 将锁对象的对象头的MarkWord替换为指向锁记录的指针。这二步如下图所示：
-   [![img](Java基础之Synchronized原理.assets/640)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8giazHicpdHpADZMibb8N7nJexCxpMXL5076bTc0tibuC6xaJRdMVf9RSIA8Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+   [![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160836)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8giazHicpdHpADZMibb8N7nJexCxpMXL5076bTc0tibuC6xaJRdMVf9RSIA8Q/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
    这时锁标志位变成 00 ，表示轻量级锁
 
 ### 轻量级锁 -> 重量级锁
 
 当锁升级为轻量级锁之后，如果依然有新线程过来竞争锁，首先新线程会自旋尝试获取锁，尝试到一定次数（默认10次）依然没有拿到，锁就会升级成重量级锁.
 
-[![img](Java基础之Synchronized原理.assets/640)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8gia5ExIwuCLlcVOLOcM1IFZYvWoJMhQUias2KUg4etbTJMdvicc8HXEcTpQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+[![img](https://cdn.jsdelivr.net/gh/OneYX/Favorites@master/images/2021/07/19/20210719160930)](https://mmbiz.qpic.cn/mmbiz_png/SoGf97KLurAicd1Y2Vmx8AMVibe6YvE8gia5ExIwuCLlcVOLOcM1IFZYvWoJMhQUias2KUg4etbTJMdvicc8HXEcTpQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 1. 将 MonitorObject 中的 _owner设置成 A线程；
 2. 将 mark word 设置为 Monitor 对象地址，锁标志位改为10
