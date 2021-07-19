@@ -56,8 +56,6 @@ mvn clean package
 
 META-INF目录下主要是maven的一些元数据信息，MANIFEST. MF文件内容如下：
 
-[![复制代码](Dloader.path失效.assets/copycode.gif)](javascript:void(0); )
-
 ```
 Manifest-Version: 1.0
 Implementation-Title: java-common-utils
@@ -71,13 +69,9 @@ Created-By: Maven Archiver 3.4.0
 Main-Class: org.springframework.boot.loader.JarLauncher
 ```
 
-[![复制代码](Dloader.path失效.assets/copycode.gif)](javascript:void(0); )
-
 其中Start-Class是项目的主程序入口，即main方法。Springboot-Boot-Classes和Spring-Boot-Lib指向的是生成的BOOT-INF下的对应位置。
 
 Main-Class属性值为org.springframework.boot.loader. JarLauncher，这个值可以通过设置属性layout来控制，如下：
-
-[![复制代码](Dloader.path失效.assets/copycode.gif)](javascript:void(0); )
 
 ```
 <plugin>
@@ -98,8 +92,6 @@ Main-Class属性值为org.springframework.boot.loader. JarLauncher，这个值�
     </executions>
 </plugin>
 ```
-
-[![复制代码](Dloader.path失效.assets/copycode.gif)](javascript:void(0); )
 
 设置<layout>ZIP</layout>时Main-Class为org.springframework.boot.loader. PropertiesLauncher，具体layout值对应Main-Class关系如下：
 
@@ -138,8 +130,6 @@ Created-By: Maven Archiver 3.4.0
 
 一般对使用spring-boot-maven-plugin插件打出的可执行jar不建议作为jar给其他服务引用，因为可能出现访问可执行jar中的一些配置文件找不到的问题。如果想让构建出来的原始jar不被重新打包，可以对spring-boot-maven-plugin插件配置classifier属性，自定义一个可运行jar名称，这样该插件就不会对原始的jar重命名操作了。
 
-[![复制代码](Dloader.path失效.assets/copycode.gif)](javascript:void(0); )
-
 ```
 <configuration>
     <!-- 指定该jar包启动时的主类[建议] -->
@@ -149,8 +139,6 @@ Created-By: Maven Archiver 3.4.0
     <classifier>myexec</classifier>
 </configuration>
 ```
-
-[![复制代码](Dloader.path失效.assets/copycode.gif)](javascript:void(0); )
 
 效果如下：
 
