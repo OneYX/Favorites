@@ -2,8 +2,6 @@
 
 假设你在路由器上搭建透明代理，要将局域网发过来的 UDP 流量（不包括路由器本身发出的流量）转发到透明代理，你需要执行以下这些命令：
 
-
-
 ```bash
 ip rule add fwmark 1 lookup 100
 ip route add local default dev lo table 100
@@ -13,8 +11,6 @@ iptables -t mangle -I OUTPUT -p udp --dport 53 -j MARK --set-mark 1
 ```
 
 如果你要转发的流量是 TCP，那你只需要执行一条命令就可以了：
-
-
 
 ```bash
 iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 1090
@@ -30,8 +26,6 @@ iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 1090
 那么为什么 TCP 可以通过 SO_ORIGINAL_DST 拿到原目的地址，UDP 却不行？
 
 原因跟 netfilter 的实现有关，SO_ORIGINAL_DST 是在 socket 上实现的，当 TCP 建立连接后，从对端的 socket 上就能拿到这个连接的原目的地址，实现成本很低。
-
-
 
 ```c
 int main() 
@@ -62,8 +56,6 @@ int main()
 ```
 
 而 UDP 不是面向连接的，无法从 socket 里去拿原目的地址：
-
-
 
 ```c
 int main() { 
@@ -109,8 +101,6 @@ int main() {
 
 再看看最开始的 TProxy 方案为什么可以。
 
-
-
 ```bash
 ip rule add fwmark 1 lookup 100
 ip route add local default dev lo table 100
@@ -121,15 +111,13 @@ iptables -t mangle -I OUTPUT -p udp --dport 53 -j MARK --set-mark 1
 
 TProxy 可以不改变包的头，将包重定向到本地 socket，所以
 
-
-
 ```bash
 iptables -t mangle -I PREROUTING -p udp --dport 53 -j TPROXY --on-port 1090 --tproxy-mark 0x01/0x01
 ```
 
 这一句直接就将包原封不动地投递到本地 1090 的 udp socket 了，那么为何还要搞个 --tproxy-mark 0x01/0x01 的选项呢？
 
-![img](透明代理UDP为什么要用TProxy.assets/1113084-89617ccf2861daa5.png)
+![img](https://cdn.jsdelivr.net/gh/OneYX/resources@master/images/2021/07/19/20210719210840.png)
 
 iptables flow
 
@@ -138,8 +126,6 @@ iptables flow
 系统中初始就有两张路由表，一张 local (ID 255)，一张 main (ID 254)，可通过 ip route show table **tableID** 查看。这两张表都是按目的地址来路由的，如果照这两张表去走，这个包妥妥地就走 FORWARD 转发流程了，因为包的目的地址不是本机。
 
 于是，就需要配置路由表，不能按目的地址来路由，所以配置按 mark 来路由：
-
-
 
 ```bash
 ip rule add fwmark 1 lookup 100 # 对于 fwmark 为 1 的包，去 table 100 查找路由
@@ -159,8 +145,6 @@ TProxy 只能在 PREROUTING 链上设置，不能在 OUTPUT 上设置，想想�
 这种情况，只能让包出去，再回来，回来的时候再通过 TProxy 规则重定向到透明代理。
 
 那怎么让它从本网口出去又马上回到本网口来呢？还是走路由，在 OUTPUT 链给包打上 1 的mark，出去的时候就会查路由表，一查发现是给到 lo 口的，于是又回来了。
-
-
 
 ```bash
 iptables -t mangle -I OUTPUT -p udp --dport 53 -j MARK --set-mark 1

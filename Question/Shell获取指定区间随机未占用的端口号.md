@@ -1,8 +1,8 @@
 ## 阅读目录
 
-- [说明](https://www.cnblogs.com/hellxz/p/11288745.html#说明)
-- [脚本内容](https://www.cnblogs.com/hellxz/p/11288745.html#脚本内容)
-- [参考文章](https://www.cnblogs.com/hellxz/p/11288745.html#参考文章)
+* [说明](https://www.cnblogs.com/hellxz/p/11288745.html#说明)
+* [脚本内容](https://www.cnblogs.com/hellxz/p/11288745.html#脚本内容)
+* [参考文章](https://www.cnblogs.com/hellxz/p/11288745.html#参考文章)
 
 ## 说明
 

@@ -167,7 +167,7 @@ public Executor newExecutor(Transaction transaction, ExecutorType executorType, 
 }
 ```
 
-以上4个方法都是Configuration的方法。这些方法在MyBatis的一个操作(新增，删除，修改，查询)中都会被执行到，执行的先后顺序是Executor，ParameterHandler，ResultSetHandler，StatementHandler(其中ParameterHandler和ResultSetHandler的创建是在创建StatementHandler[3个可用的实现类CallableStatementHandler,PreparedStatementHandler,SimpleStatementHandler]的时候，其构造函数调用的[这3个实现类的构造函数其实都调用了父类BaseStatementHandler的构造函数])。
+以上4个方法都是Configuration的方法。这些方法在MyBatis的一个操作(新增，删除，修改，查询)中都会被执行到，执行的先后顺序是Executor，ParameterHandler，ResultSetHandler，StatementHandler(其中ParameterHandler和ResultSetHandler的创建是在创建StatementHandler[3个可用的实现类CallableStatementHandler, PreparedStatementHandler, SimpleStatementHandler]的时候，其构造函数调用的[这3个实现类的构造函数其实都调用了父类BaseStatementHandler的构造函数])。
 
 这4个方法实例化了对应的对象之后，都会调用interceptorChain的pluginAll方法，InterceptorChain的pluginAll刚才已经介绍过了，就是遍历所有的拦截器，然后调用各个拦截器的plugin方法。**注意：拦截器的plugin方法的返回值会直接被赋值给原先的对象**
 
@@ -256,7 +256,7 @@ private static Class<?>[] getAllInterfaces(Class<?> type, Map<Class<?>, Set<Meth
 }
 ```
 
-getAllInterfaces方法解释：根据目标实例target(这个target就是之前所说的MyBatis拦截器可以拦截的类，Executor,ParameterHandler,ResultSetHandler,StatementHandler)和它的父类们，返回signatureMap中含有target实现的接口数组。
+getAllInterfaces方法解释：根据目标实例target(这个target就是之前所说的MyBatis拦截器可以拦截的类，Executor, ParameterHandler, ResultSetHandler, StatementHandler)和它的父类们，返回signatureMap中含有target实现的接口数组。
 
 所以Plugin这个类的作用就是根据 @Interceptors注解，得到这个注解的属性 @Signature数组，然后根据每个 @Signature注解的type，method，args属性使用反射找到对应的Method。最终根据调用的target对象实现的接口决定是否返回一个代理对象替代原先的target对象。
 
