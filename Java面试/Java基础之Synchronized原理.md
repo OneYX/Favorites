@@ -12,17 +12,15 @@ synchronized可以添加互斥锁，并且保证被其他线程看到。
 
 synchronized关键字最主要有以下3种应用方式，下面分别介绍
 
-- 修饰实例方法，作用于当前实例加锁，进入同步代码钱要获得当前实例的锁
-- 修饰静态方法，作用于当前类对象加锁，进入同步代码前要获得当前类对象的锁
-- 修饰代码块，指定加锁对象，对给定对象加锁，进入同步代码块前要获得给定对象的锁
+* 修饰实例方法，作用于当前实例加锁，进入同步代码钱要获得当前实例的锁
+* 修饰静态方法，作用于当前类对象加锁，进入同步代码前要获得当前类对象的锁
+* 修饰代码块，指定加锁对象，对给定对象加锁，进入同步代码块前要获得给定对象的锁
 
 ### synchronized作用于实例方法
 
-我们设置类变量`static`为共享资源， 然后多个线程去修改。修改的含义是： 先读取，计算，再写入。那么这个过程就不是原子的，多个线程操作就会出现共享资源争抢问题。
+我们设置类变量 `static` 为共享资源， 然后多个线程去修改。修改的含义是： 先读取，计算，再写入。那么这个过程就不是原子的，多个线程操作就会出现共享资源争抢问题。
 
 我们在实例方法上添加synchronized，那么，同一个实例执行本方法时，抢到锁到可以执行。
-
-
 
 ```
 public class AccountingSync implements Runnable{
@@ -58,13 +56,11 @@ public class AccountingSync implements Runnable{
 }
 ```
 
-上述代码中，开启两个线程去操作共享变量，两个线程执行的是同一个实例对象。如果不添加synchronized，其中`i++`不是原子操作，该操作先读取值，然后再写入一个新值。如果两个线程都读取了i=5，然后线程1写入i=6.线程2后写入，但也是写入i=6, 并不是我们期望的i=7.
+上述代码中，开启两个线程去操作共享变量，两个线程执行的是同一个实例对象。如果不添加synchronized，其中 `i++` 不是原子操作，该操作先读取值，然后再写入一个新值。如果两个线程都读取了i=5，然后线程1写入i=6. 线程2后写入，但也是写入i=6, 并不是我们期望的i=7.
 
 添加synchronized修饰后，线程安全，线程必须获取到这个实力到锁才能执行读取和写入。
 
 注意，我们synchronized修饰到是类方法，锁的是实例，当多个线程操作不同实例时，会使用不同实例的锁，就无法保证修改static变量的有序性了。
-
-
 
 ```
 public class AccountingSyncBad implements Runnable{
@@ -103,8 +99,6 @@ synchronized作用于静态方法时，锁就是当前类到class对象锁。由
 
 除了使用关键字修饰实例方法和静态方法外，还可以使用同步代码块。
 
-
-
 ```
 public class AccountingSync implements Runnable{
     static AccountingSync instance=new AccountingSync();
@@ -129,9 +123,7 @@ public class AccountingSync implements Runnable{
 }
 ```
 
-上述代码，将synchronized作用于一个给定的实例对象instance, 即当前实例对象就是锁对象，每次当线程进入synchronized包裹到代码块时，就会要求当前线程持有instance实例对象锁，如果当前有其他线程正持有该对象锁，那么新到到线程就必须等待，这样也就保证了每次只有一个线程执行`i++`操作。当然， 还可以使用this或者class
-
-
+上述代码，将synchronized作用于一个给定的实例对象instance, 即当前实例对象就是锁对象，每次当线程进入synchronized包裹到代码块时，就会要求当前线程持有instance实例对象锁，如果当前有其他线程正持有该对象锁，那么新到到线程就必须等待，这样也就保证了每次只有一个线程执行 `i++` 操作。当然， 还可以使用this或者class
 
 ```
 //this,当前实例对象锁
@@ -161,8 +153,8 @@ Java虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)�
 
 ![img](https://cdn.jsdelivr.net/gh/OneYX/resources@master/images/2021/07/19/20210719171615.png)
 
-- 实例变量： 存放类的属性数据信息，包括父类的属性信息，如果是数组的实例部分还包括数组的长度，这部分内存按4字节对齐。
-- 填充数据：由于虚拟机要求对象起始地址必须是8字节的整数倍。填充数据不是必须存在的，仅仅是为了字节对齐。
+* 实例变量： 存放类的属性数据信息，包括父类的属性信息，如果是数组的实例部分还包括数组的长度，这部分内存按4字节对齐。
+* 填充数据：由于虚拟机要求对象起始地址必须是8字节的整数倍。填充数据不是必须存在的，仅仅是为了字节对齐。
 
 而对于顶部，则是Java头对象，它是实现synchronized的锁对象的基础，这点我们重点分析它。 一般而言，synchronized使用的锁对象是存储在Java对象头里的，jvm采用2个字来存储对象头(如果对象是数组则会分配3个字，多出来到1个字记录的是数组长度)，其主要结构是由Mark Word和Class Metadata Address组成，其结构说明如下：
 
@@ -182,8 +174,6 @@ Java虚拟机中的同步(Synchronization)基于进入和退出管程(Monitor)�
 ![img](https://cdn.jsdelivr.net/gh/OneYX/resources@master/images/2021/07/19/20210719171728.png)
 
 其中，轻量级锁和偏向锁是Java 6对synchronized锁进行优化后新增加的，我们稍后简要分析。这里我们主要分析一下重量级锁也就是通常说的synchronized的对象锁，锁标识位10，其中指针指向的时monitor对象(也称为管程或监视器锁)的起始地址。每个对象都存在着一个monitor与之关联，对象与其monitor之间的关系有存在多种实现方式，如monitor可以与对象一起创建销毁或当线程试图获取对象锁时自动生成，但当一个monitor被某个线程持有后，它便处于锁定状态。在Java虚拟机(HotSpot)中，monitor是由ObjetMonitor实现的，其主要数据结构如下(位于HotSpot虚拟机源码ObjectMonitor.hpp文件，C++实现的)
-
-
 
 ```
 ObjectMonitor() {
@@ -206,9 +196,9 @@ ObjectMonitor() {
   }
 ```
 
-ObjectMonitor中有两个队列， `_WaitSet`和`_EntryList`， 用来保存ObjectWaiter对象列表(每个等待锁的线程都会被封装成ObjectWaiter对象)， `_owner`指向持有ObjectMonitor对象的线程。
+ObjectMonitor中有两个队列， `_WaitSet` 和 `_EntryList` ， 用来保存ObjectWaiter对象列表(每个等待锁的线程都会被封装成ObjectWaiter对象)， `_owner` 指向持有ObjectMonitor对象的线程。
 
-当多个线程同时访问一段同步代码时，首先会进入`_EntryList`集合， 当线程获取到对象的monitor后，进入`_owner`区域， 并把monitor中到onwer变量设置为当前线程， 同时monitor中的计数器count+1。
+当多个线程同时访问一段同步代码时，首先会进入 `_EntryList` 集合， 当线程获取到对象的monitor后，进入 `_owner` 区域， 并把monitor中到onwer变量设置为当前线程， 同时monitor中的计数器count+1。
 
 若线程调用wait()方法，将释放当前持有的monitor， owner=null， count-1, 同时该线程进入waitSet集合中等待被唤醒。若当前线程执行完毕也将释放monitor(锁)，并复位变量的值，以便其他线程进入获取monitor(锁)。 如下图所示：
 
@@ -219,8 +209,6 @@ ObjectMonitor中有两个队列， `_WaitSet`和`_EntryList`， 用来保存Obje
 ## synchronized代码块底层原理
 
 现在我们重新定义一个synchronized修饰的同步代码块， 在代码块中操作共享变量i。
-
-
 
 ```
 public class SyncCodeBlock {
@@ -237,8 +225,6 @@ public class SyncCodeBlock {
 ```
 
 编译上述代码，并使用javap反编译得到字节码如下(这里我们省略一部分没有必要的信息)：
-
-
 
 ```
 Classfile /Users/zejian/Downloads/Java8_Action/src/main/java/com/zejian/concurrencys/SyncCodeBlock.class
@@ -295,8 +281,6 @@ SourceFile: "SyncCodeBlock.java"
 
 我们主要关注字节码中的如下代码：
 
-
-
 ```
 3: monitorenter  //进入同步方法
 //..........省略其他  
@@ -312,8 +296,6 @@ SourceFile: "SyncCodeBlock.java"
 
 方法级的同步是隐式，即无需通过字节码指令来控制的，它实现在方法调用和返回操作之中。JVM可以从方法常量池中的方法表结构(method_info Structure) 中的 ACC_SYNCHRONIZED 访问标志区分一个方法是否同步方法。当方法调用时，调用指令将会 检查方法的 ACC_SYNCHRONIZED 访问标志是否被设置，如果设置了，执行线程将先持有monitor（虚拟机规范中用的是管程一词）， 然后再执行方法，最后再方法完成(无论是正常完成还是非正常完成)时释放monitor。在方法执行期间，执行线程持有了monitor，其他任何线程都无法再获得同一个monitor。如果一个同步方法执行期间抛 出了异常，并且在方法内部无法处理此异常，那这个同步方法所持有的monitor将在异常抛到同步方法之外时自动释放。下面我们看看字节码层面如何实现：
 
-
-
 ```
 public class SyncMethod {
 
@@ -326,8 +308,6 @@ public class SyncMethod {
 ```
 
 使用javap反编译后的字节码如下：
-
-
 
 ```
 Classfile /Users/zejian/Downloads/Java8_Action/src/main/java/com/zejian/concurrencys/SyncMethod.class
@@ -374,7 +354,7 @@ SourceFile: "SyncMethod.java"
 
 ### 偏向锁
 
-偏向锁是Java 6之后加入的新锁，它是一种针对加锁操作的优化手段，经过研究发现，在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，因此为了减少同一线程获取锁(会涉及到一些CAS操作,耗时)的代价而引入偏向锁。偏向锁的核心思想是，如果一个线程获得了锁，那么锁就进入偏向模式，此时Mark Word 的结构也变为偏向锁结构，当这个线程再次请求锁时，无需再做任何同步操作，即获取锁的过程，这样就省去了大量有关锁申请的操作，从而也就提供程序的性能。所以，对于没有锁竞争的场合，偏向锁有很好的优化效果，毕竟极有可能连续多次是同一个线程申请相同的锁。但是对于锁竞争比较激烈的场合，偏向锁就失效了，因为这样场合极有可能每次申请锁的线程都是不相同的，因此这种场合下不应该使用偏向锁，否则会得不偿失，需要注意的是，偏向锁失败后，并不会立即膨胀为重量级锁，而是先升级为轻量级锁。下面我们接着了解轻量级锁。
+偏向锁是Java 6之后加入的新锁，它是一种针对加锁操作的优化手段，经过研究发现，在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，因此为了减少同一线程获取锁(会涉及到一些CAS操作, 耗时)的代价而引入偏向锁。偏向锁的核心思想是，如果一个线程获得了锁，那么锁就进入偏向模式，此时Mark Word 的结构也变为偏向锁结构，当这个线程再次请求锁时，无需再做任何同步操作，即获取锁的过程，这样就省去了大量有关锁申请的操作，从而也就提供程序的性能。所以，对于没有锁竞争的场合，偏向锁有很好的优化效果，毕竟极有可能连续多次是同一个线程申请相同的锁。但是对于锁竞争比较激烈的场合，偏向锁就失效了，因为这样场合极有可能每次申请锁的线程都是不相同的，因此这种场合下不应该使用偏向锁，否则会得不偿失，需要注意的是，偏向锁失败后，并不会立即膨胀为重量级锁，而是先升级为轻量级锁。下面我们接着了解轻量级锁。
 
 ### 轻量级锁
 
@@ -387,8 +367,6 @@ SourceFile: "SyncMethod.java"
 ### 锁消除
 
 消除锁是虚拟机另外一种锁的优化，这种优化更彻底，Java虚拟机在JIT编译时(可以简单理解为当某段代码即将第一次被执行时进行编译，又称即时编译)，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁，通过这种方式消除没有必要的锁，可以节省毫无意义的请求锁时间，如下StringBuffer的append是一个同步方法，但是在add方法中的StringBuffer属于一个局部变量，并且不会被其他线程所使用，因此StringBuffer不可能存在共享资源竞争的情景，JVM会自动将其锁消除。
-
-
 
 ```
 /**
@@ -428,10 +406,16 @@ public class StringBufferRemoveSync {
 
 1. 线程A在自己的栈桢中创建锁记录 LockRecord。
 2. 线程A 将 Mark Word 拷贝到线程栈的 Lock Record中，这个位置叫 displayced hdr，如下图所示：
-   ![img](https://cdn.jsdelivr.net/gh/OneYX/resources@master/images/2021/07/19/20210719171644.png)
+   
+
+![img](https://cdn.jsdelivr.net/gh/OneYX/resources@master/images/2021/07/19/20210719171644.png)
+
 3. 将锁记录中的Owner指针指向加锁的对象（存放对象地址）。
 4. 将锁对象的对象头的MarkWord替换为指向锁记录的指针。这二步如下图所示：
-   ![img](https://cdn.jsdelivr.net/gh/OneYX/resources@master/images/2021/07/19/20210719171647.png)
+   
+
+![img](https://cdn.jsdelivr.net/gh/OneYX/resources@master/images/2021/07/19/20210719171647.png)
+
    这时锁标志位变成 00 ，表示轻量级锁
 
 ### 轻量级锁 -> 重量级锁
@@ -446,15 +430,15 @@ public class StringBufferRemoveSync {
 
 JVM 每次从Waiting Queue 的尾部取出一个线程放到OnDeck作为候选者，但是如果并发比较高，Waiting Queue会被大量线程执行CAS操作，为了降低对尾部元素的竞争，将Waiting Queue 拆分成ContentionList 和 EntryList 二个队列, JVM将一部分线程移到EntryList 作为准备进OnDeck的预备线程。另外说明几点：
 
-所有请求锁的线程首先被放在ContentionList这个竞争队列中;
+所有请求锁的线程首先被放在ContentionList这个竞争队列中; 
 
-Contention List 中那些有资格成为候选资源的线程被移动到 Entry List 中;
+Contention List 中那些有资格成为候选资源的线程被移动到 Entry List 中; 
 
-任意时刻，最多只有一个线程正在竞争锁资源，该线程被成为 OnDeck;
+任意时刻，最多只有一个线程正在竞争锁资源，该线程被成为 OnDeck; 
 
-当前已经获取到所资源的线程被称为 Owner;
+当前已经获取到所资源的线程被称为 Owner; 
 
-处于 ContentionList、EntryList、WaitSet 中的线程都处于阻塞状态，该阻塞是由操作系统来完成的(Linux 内核下采用 `pthread_mutex_lock` 内核函数实现的);
+处于 ContentionList、EntryList、WaitSet 中的线程都处于阻塞状态，该阻塞是由操作系统来完成的(Linux 内核下采用 `pthread_mutex_lock` 内核函数实现的); 
 
 作为Owner 的A 线程执行过程中，可能调用wait 释放锁，这个时候A线程进入 Wait Set , 等待被唤醒。
 
@@ -465,8 +449,6 @@ Contention List 中那些有资格成为候选资源的线程被移动到 Entry 
 ### synchronized的可重入性
 
 从互斥锁的设计上来说，当一个线程试图操作一个由其他线程持有的对象锁的临界资源时，将会处于阻塞状态，但当一个线程再次请求自己持有对象锁的临界资源时，这种情况属于重入锁，请求将会成功，在java中synchronized是基于原子性的内部锁机制，是可重入的，因此在一个线程调用synchronized方法的同时在其方法体内部调用该对象另一个synchronized方法，也就是说一个线程得到一个对象锁后再次请求该对象锁，是允许的，这就是synchronized的可重入性。如下：
-
-
 
 ```
 public class AccountingSync implements Runnable{
@@ -489,7 +471,6 @@ public class AccountingSync implements Runnable{
         j++;
     }
 
-
     public static void main(String[] args) throws InterruptedException {
         Thread t1=new Thread(instance);
         Thread t2=new Thread(instance);
@@ -508,8 +489,6 @@ public class AccountingSync implements Runnable{
 
 正如中断二字所表达的意义，在线程运行(run方法)中间打断它，在Java中，提供了以下3个有关线程中断的方法
 
-
-
 ```
 //中断线程（实例方法）
 public void Thread.interrupt();
@@ -522,8 +501,6 @@ public static boolean Thread.interrupted();
 ```
 
 当一个线程处于被阻塞状态或者试图执行一个阻塞操作时，使用Thread.interrupt()方式中断该线程，注意此时将会抛出一个InterruptedException的异常，同时中断状态将会被复位(由中断状态改为非中断状态)，如下代码将演示该过程：
-
-
 
 ```
 public class InterruputSleepThread3 {
@@ -559,13 +536,11 @@ public class InterruputSleepThread3 {
 }
 ```
 
-如上述代码所示，我们创建一个线程，并在线程中调用了sleep方法从而使用线程进入阻塞状态，启动线程后，调用线程实例对象的interrupt方法中断阻塞异常，并抛出InterruptedException异常，此时中断状态也将被复位。这里有些人可能会诧异，为什么不用Thread.sleep(2000);而是用TimeUnit.SECONDS.sleep(2);其实原因很简单，前者使用时并没有明确的单位说明，而后者非常明确表达秒的单位，事实上后者的内部实现最终还是调用了Thread.sleep(2000);，但为了编写的代码语义更清晰，建议使用TimeUnit.SECONDS.sleep(2);的方式，注意TimeUnit是个枚举类型。ok~，除了阻塞中断的情景，我们还可能会遇到处于运行期且非阻塞的状态的线程，这种情况下，直接调用Thread.interrupt()中断线程是不会得到任响应的，如下代码，将无法中断非阻塞状态下的线程：
+如上述代码所示，我们创建一个线程，并在线程中调用了sleep方法从而使用线程进入阻塞状态，启动线程后，调用线程实例对象的interrupt方法中断阻塞异常，并抛出InterruptedException异常，此时中断状态也将被复位。这里有些人可能会诧异，为什么不用Thread.sleep(2000); 而是用TimeUnit. SECONDS.sleep(2); 其实原因很简单，前者使用时并没有明确的单位说明，而后者非常明确表达秒的单位，事实上后者的内部实现最终还是调用了Thread.sleep(2000); ，但为了编写的代码语义更清晰，建议使用TimeUnit. SECONDS.sleep(2); 的方式，注意TimeUnit是个枚举类型。ok~，除了阻塞中断的情景，我们还可能会遇到处于运行期且非阻塞的状态的线程，这种情况下，直接调用Thread.interrupt()中断线程是不会得到任响应的，如下代码，将无法中断非阻塞状态下的线程：
 
 ## 等待唤醒机制与synchronized
 
 所谓等待唤醒机制本篇主要指的是notify/notifyAll和wait方法，在使用这3个方法时，必须处于synchronized代码块或者synchronized方法中，否则就会抛出IllegalMonitorStateException异常，这是因为调用这几个方法前必须拿到当前对象的监视器monitor对象，也就是说notify/notifyAll和wait方法依赖于monitor对象，在前面的分析中，我们知道monitor 存在于对象头的Mark Word 中(存储monitor引用指针)，而synchronized关键字可以获取 monitor ，这也就是为什么notify/notifyAll和wait方法必须在synchronized代码块或者synchronized方法调用的原因。
-
-
 
 ```
 synchronized (obj) {
@@ -579,6 +554,6 @@ synchronized (obj) {
 
 ## 来源
 
-- https://blog.csdn.net/javazejian/article/details/72828483
-- https://mp.weixin.qq.com/s/ts2Pjz3VpWm50kY-Ru7iTA
-- https://www.cnblogs.com/woshimrf/p/java-synchronized.html
+* https://blog.csdn.net/javazejian/article/details/72828483
+* https://mp.weixin.qq.com/s/ts2Pjz3VpWm50kY-Ru7iTA
+* https://www.cnblogs.com/woshimrf/p/java-synchronized.html
