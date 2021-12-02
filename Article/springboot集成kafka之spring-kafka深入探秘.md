@@ -59,7 +59,7 @@ public class Application {
 
 不过上面的代码能够启动成功，前提是你已经有了Kafka Server的服务环境，我们知道Kafka是由Scala + Zookeeper构建的，可以从官网下载部署包在本地部署。但是，我想告诉你，为了简化开发环节验证Kafka相关功能，Spring-Kafka-Test已经封装了Kafka-test提供了注解式的一键开启Kafka Server的功能，使用起来也是超级简单。本文后面的所有测试用例的Kafka都是使用这种嵌入式服务提供的。
 
-### 引入依赖![img](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
+### 引入依赖![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 ```xml
 <dependency>
@@ -260,8 +260,6 @@ initialize()：当setAutoCreate为false时，需要我们程序显示的调用ad
 spring.kafka.producer.transaction-id-prefix=kafka_tx.
 ```
 
-![img](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
-
 当发送消息有事务要求时，比如，当所有消息发送成功才算成功，如下面的例子：假设第一条消费发送后，在发第二条消息前出现了异常，那么第一条已经发送的消息也会回滚。而且正常情况下，假设在消息一发送后休眠一段时间，在发送第二条消息，消费端也只有在事务方法执行完成后才会接收到消息
 
 ```java
@@ -302,8 +300,6 @@ for the transactions state topic (configured via 'transaction.state.log.replicat
 This error can be ignored if the cluster is starting up and not all brokers are up yet.
 ```
 
-![img](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
-
 默认Broker的配置transaction.state.log.replication.factor=3，单节点只能调整为1
 
 2、副本数小于副本同步队列数目，会抛如下异常
@@ -311,8 +307,6 @@ This error can be ignored if the cluster is starting up and not all brokers are 
 ```
 Number of insync replicas for partition __transaction_state-13 is [1], below required minimum [2]
 ```
-
-![img](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 默认Broker的配置transaction.state.log.min.isr=2，单节点只能调整为1
 
@@ -323,8 +317,6 @@ ReplyingKafkaTemplate是KafkaTemplate的一个子类，除了继承父类的方�
 ```
 RequestReplyFuture sendAndReceive(ProducerRecord record);
 ```
-
-![img](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)![点击并拖拽以移动](data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==)
 
 也就是我发送一条消息，能够拿到消费者给我返回的结果。就像传统的RPC交互那样。当消息的发送者需要知道消息消费者的具体的消费情况，非常适合这个api。如，一条消息中发送一批数据，需要知道消费者成功处理了哪些数据。下面代码演示了怎么集成以及使用ReplyingKafkaTemplate
 
